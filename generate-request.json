@@ -1,0 +1,13 @@
+[
+    {
+        "tableName":"project",
+        "fields": [
+            {
+                "fieldName":"id",
+                "dataType":"int",
+                "isPrimaryKey":true,
+                "isAutoIncrement":true
+            }
+        ]
+    }
+]
