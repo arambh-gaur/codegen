@@ -27,6 +27,12 @@ public class SchemaService {
     @Autowired
     private SchemaRepository schemaRepository;
 
+    @Autowired
+    private ClassGeneratorService classGeneratorService;
+
+    @Autowired
+    private ControllerGenerationService controllerGenerationService;
+
     public void generateSchema(List<EntityRequestDTO> requestList) {
         log.info("Generating schema with input :{}",requestList);
         try {
@@ -93,11 +99,16 @@ public class SchemaService {
                         tableCreationSequence.add(entityRequestDTO.getId());
                     }
                     log.info("Finished generating schema for input :{}",entityRequestDTO);
+                    //classGeneratorService.generateClassesByteBuddy(entityRequestDTO);
+                    //classGeneratorService.generateClassJavaPoet();
+                    controllerGenerationService.generateController();
                 }
 
             }
             log.info("Compiled all create statements");
-            schemaRepository.createSchemaTables(tableCreationSequence,tableCreationStatements);
+            //schemaRepository.createSchemaTables(tableCreationSequence,tableCreationStatements);
+
+
         } catch (BusinessLayerException be) {
             log.error("Exception occurred in generateSchema for input :{}, Exception :\n",requestList,be);
         }

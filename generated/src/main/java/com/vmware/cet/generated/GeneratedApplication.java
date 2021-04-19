@@ -1,14 +1,13 @@
-package com.vmware.cet.codegen;
+package com.vmware.cet.generated;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 @SpringBootApplication
-public class CodegenApplication {
+public class GeneratedApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(CodegenApplication.class, args);
+		SpringApplication.run(GeneratedApplication.class, args);
 	}
 
 }

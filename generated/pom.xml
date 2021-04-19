@@ -9,16 +9,14 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.vmware.cet</groupId>
-	<artifactId>codegen</artifactId>
+	<artifactId>generated</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>codegen</name>
-	<description>Project for dynamic code generation</description>
+	<name>generated</name>
+	<description>Demo project for Spring Boot</description>
 	<properties>
 		<java.version>1.8</java.version>
 	</properties>
-
 	<dependencies>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -33,46 +31,16 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.12.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>net.bytebuddy</groupId>
-			<artifactId>byte-buddy</artifactId>
-			<version>1.10.22</version>
-		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/org.jboss.windup.decompiler.procyon/procyon-core -->
-		<dependency>
-			<groupId>org.jboss.windup.decompiler.procyon</groupId>
-			<artifactId>procyon-core</artifactId>
-			<version>2.5.0.Final</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.squareup</groupId>
-			<artifactId>javapoet</artifactId>
-			<version>1.10.0</version>
-		</dependency>
-
-
 	</dependencies>
 
 	<build>
