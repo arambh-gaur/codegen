@@ -4,7 +4,7 @@ import lombok.Getter;
 
 public enum DatabaseTypeConstant {
 
-    VARCHAR("varchar"),
+    VARCHAR("varchar(500)"),
     INT("int"),
     DATETIME("datetime"),
     BOOLEAN("boolean");

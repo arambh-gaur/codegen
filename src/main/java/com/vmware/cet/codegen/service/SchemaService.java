@@ -31,6 +31,9 @@ public class SchemaService {
     private ClassGeneratorService classGeneratorService;
 
     @Autowired
+    private ModelGeneratorService modelGeneratorService;
+
+    @Autowired
     private ControllerGenerationService controllerGenerationService;
 
     public void generateSchema(List<EntityRequestDTO> requestList) {
@@ -99,9 +102,8 @@ public class SchemaService {
                         tableCreationSequence.add(entityRequestDTO.getId());
                     }
                     log.info("Finished generating schema for input :{}",entityRequestDTO);
-                    //classGeneratorService.generateClassesByteBuddy(entityRequestDTO);
-                    //classGeneratorService.generateClassJavaPoet();
                     controllerGenerationService.generateController();
+                    modelGeneratorService.generateModelClass(entityRequestDTO);
                 }
 
             }
