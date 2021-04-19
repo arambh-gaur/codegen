@@ -29,9 +29,6 @@ public class SchemaService {
     private SchemaRepository schemaRepository;
 
     @Autowired
-    private ClassGeneratorService classGeneratorService;
-
-    @Autowired
     private ModelGeneratorService modelGeneratorService;
 
     @Autowired
@@ -39,6 +36,9 @@ public class SchemaService {
 
     @Autowired
     private ControllerGenerationService controllerGenerationService;
+
+    @Autowired
+    private RepositoryGenerationService repositoryGenerationService;
 
     @Value("${generated.code.service.pakage.name}")
     private String businessClassPackage;
@@ -110,15 +110,16 @@ public class SchemaService {
                     }
                     log.info("Finished generating schema for input :{}",entityRequestDTO);
 
-                    modelGeneratorService.generateModelClass(entityRequestDTO);
+                    String modelClassName = modelGeneratorService.generateModelClass(entityRequestDTO);
                     String businessClassname = businessGenerationService.generateBusinessClass(entityRequestDTO);
                     controllerGenerationService.generateController(businessClassPackage,CodegenConstant.BUSINESS_CLASSNAME.getValue());
-
+                    repositoryGenerationService.generateRepositoryClass(modelClassName, entityRequestDTO);
+                    log.info("Compiled all create statements");
                 }
 
             }
-            log.info("Compiled all create statements");
-            //schemaRepository.createSchemaTables(tableCreationSequence,tableCreationStatements);
+
+            schemaRepository.createSchemaTables(tableCreationSequence,tableCreationStatements);
 
 
         } catch (BusinessLayerException be) {

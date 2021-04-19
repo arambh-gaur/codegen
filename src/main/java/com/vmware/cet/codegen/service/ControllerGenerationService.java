@@ -43,9 +43,6 @@ public class ControllerGenerationService {
                     .addMember("value", "\"/api/v1\"")
                     .build();
 
-            /*Class<?> clazz = Class.forName(businessClassname);
-            Type businessClassType = clazz;*/
-
             FieldSpec.Builder fsBuilder;
             try {
                 ClassName clazz = ClassName.get(packageName, businessClassname);
@@ -80,21 +77,6 @@ public class ControllerGenerationService {
             log.error("Exception occurred in generateController, exception :\n",e);
         }
 
-    }
-
-    private void getFieldSpec() {
-        FieldSpec.Builder fsBuilder;
-        try {
-            ClassName clazz = ClassName.get("package.to.services", "AService");
-            fsBuilder = FieldSpec.builder(clazz, "aService")
-                    .addModifiers(Modifier.PRIVATE)
-                    .addAnnotation(Autowired.class);
-        } catch (MirroredTypeException mte) {
-            DeclaredType classTypeMirror = (DeclaredType) mte.getTypeMirror();
-            fsBuilder = FieldSpec.builder(TypeName.get(classTypeMirror), "aService")
-                    .addModifiers(Modifier.PRIVATE)
-                    .addAnnotation(Autowired.class);
-        }
     }
 
 }
