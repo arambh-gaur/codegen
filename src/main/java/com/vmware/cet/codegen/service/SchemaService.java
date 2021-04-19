@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.aspectj.apache.bcel.classfile.Code;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -38,6 +39,9 @@ public class SchemaService {
 
     @Autowired
     private ControllerGenerationService controllerGenerationService;
+
+    @Value("${generated.code.service.pakage.name}")
+    private String businessClassPackage;
 
     public void generateSchema(List<EntityRequestDTO> requestList) {
         log.info("Generating schema with input :{}",requestList);
@@ -105,9 +109,10 @@ public class SchemaService {
                         tableCreationSequence.add(entityRequestDTO.getId());
                     }
                     log.info("Finished generating schema for input :{}",entityRequestDTO);
-                    controllerGenerationService.generateController();
+
                     modelGeneratorService.generateModelClass(entityRequestDTO);
-                    businessGenerationService.generateBusinessClass(entityRequestDTO);
+                    String businessClassname = businessGenerationService.generateBusinessClass(entityRequestDTO);
+                    controllerGenerationService.generateController(businessClassPackage,CodegenConstant.BUSINESS_CLASSNAME.getValue());
 
                 }
 

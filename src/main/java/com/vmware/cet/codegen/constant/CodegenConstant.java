@@ -6,7 +6,10 @@ public enum CodegenConstant {
 
     COMMA_SEPERATOR(","),
     EMPTY_STRING(""),
-    NEWLINE("\n");
+    NEWLINE("\n"),
+    BUSINESS_CLASSNAME("CodegenService"),
+    BUSINESS_REFERENCE_VARIABLE("codegenService"),
+    CONTROLLER_CLASSNAME("CodegenController");
 
     @Getter
     private String value;
