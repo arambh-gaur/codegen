@@ -31,7 +31,7 @@ public class ControllerGenerationService {
                     .addMember("value", "\"/api/v1\"")
                     .build();
 
-            TypeSpec person = TypeSpec
+            TypeSpec controller = TypeSpec
                     .classBuilder("CodegenController")
                     .addAnnotation(RestController.class)
                     .addAnnotation(requestMappingAnnotation)
@@ -40,7 +40,7 @@ public class ControllerGenerationService {
 
             log.info("Added class");
             Path path = Paths.get(generatedCodePath);
-            JavaFile.builder("com.vmware.cet.generated.controller", person).build().writeTo(path);
+            JavaFile.builder("com.vmware.cet.generated.controller", controller).build().writeTo(path);
         } catch (Exception e) {
 
         }

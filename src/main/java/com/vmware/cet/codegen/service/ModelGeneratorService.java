@@ -43,6 +43,7 @@ public class ModelGeneratorService {
                 className = entityRequestDTO.getTableName();
                 // set the first letter of the classname to uppercase
                 if(!StringUtils.isBlank(className)) {
+                    className = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, className);
                     className = className.substring(0, 1).toUpperCase() + className.substring(1);
                 }
 
@@ -73,7 +74,7 @@ public class ModelGeneratorService {
                 }
 
                 TypeSpec modelClass = TypeSpec
-                        .classBuilder(entityRequestDTO.getTableName())
+                        .classBuilder(className)
                         .addAnnotation(Data.class)
                         .addModifiers(Modifier.PUBLIC)
                         .addFields(fields)
