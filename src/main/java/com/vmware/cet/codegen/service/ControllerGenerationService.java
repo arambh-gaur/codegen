@@ -19,8 +19,11 @@ import java.nio.file.Paths;
 @Slf4j
 public class ControllerGenerationService {
 
-    @Value("generated.code.source.path")
+    @Value("${generated.code.source.path}")
     private String generatedCodePath;
+
+    @Value("${generated.code.controller.pakage.name}")
+    private String controllerClassPackage;
 
     public void generateController() {
 
@@ -34,13 +37,14 @@ public class ControllerGenerationService {
             TypeSpec controller = TypeSpec
                     .classBuilder("CodegenController")
                     .addAnnotation(RestController.class)
+                    .addAnnotation(Slf4j.class)
                     .addAnnotation(requestMappingAnnotation)
                     .addModifiers(Modifier.PUBLIC)
                     .build();
 
             log.info("Added class");
             Path path = Paths.get(generatedCodePath);
-            JavaFile.builder("com.vmware.cet.generated.controller", controller).build().writeTo(path);
+            JavaFile.builder(controllerClassPackage, controller).build().writeTo(path);
         } catch (Exception e) {
 
         }

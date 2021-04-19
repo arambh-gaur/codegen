@@ -34,6 +34,9 @@ public class SchemaService {
     private ModelGeneratorService modelGeneratorService;
 
     @Autowired
+    private BusinessGenerationService businessGenerationService;
+
+    @Autowired
     private ControllerGenerationService controllerGenerationService;
 
     public void generateSchema(List<EntityRequestDTO> requestList) {
@@ -104,6 +107,8 @@ public class SchemaService {
                     log.info("Finished generating schema for input :{}",entityRequestDTO);
                     controllerGenerationService.generateController();
                     modelGeneratorService.generateModelClass(entityRequestDTO);
+                    businessGenerationService.generateBusinessClass(entityRequestDTO);
+
                 }
 
             }
