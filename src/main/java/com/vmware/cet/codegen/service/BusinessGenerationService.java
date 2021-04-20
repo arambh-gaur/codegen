@@ -44,34 +44,60 @@ public class BusinessGenerationService {
         try {
 
             List<MethodSpec> methods = new ArrayList<>();
-            MethodSpec fetchProjects = MethodSpec
+            MethodSpec fetchMethod = MethodSpec
                     .methodBuilder("fetchProjects")
                     .returns(List.class)
                     .addModifiers(Modifier.PUBLIC)
                     .addStatement("return "+CodegenConstant.REPOSITORY_REFERENCE_VARIABLE.getValue()+".findAll()")
                     .build();
-            methods.add(fetchProjects);
+            methods.add(fetchMethod);
 
-            MethodSpec.Builder saveProjectBuilder;
+            MethodSpec deleteMethod = MethodSpec
+                    .methodBuilder("deleteProject")
+                    .returns(String.class)
+                    .addParameter(Integer.class, "projectId")
+                    .addModifiers(Modifier.PUBLIC)
+                    .addStatement(CodegenConstant.REPOSITORY_REFERENCE_VARIABLE.getValue()+".deleteById(projectId)")
+                    .addStatement("return \"Entity deleted\"")
+                    .build();
+            methods.add(deleteMethod);
+
+            MethodSpec.Builder saveMethodBuilder;
+            MethodSpec.Builder updateMethodBuilder;
 
             try {
                 ClassName clazz = ClassName.get(modelClassPackage, modelClassname);
-                saveProjectBuilder = MethodSpec
+                saveMethodBuilder = MethodSpec
                         .methodBuilder("saveProject")
-                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(clazz,"project");
+                updateMethodBuilder = MethodSpec
+                        .methodBuilder("updateProject")
                         .addParameter(clazz,"project")
-                        .addStatement(CodegenConstant.REPOSITORY_REFERENCE_VARIABLE.getValue()+".save(project)");
+                        .addParameter(Integer.class,"projectId")
+                        .addStatement("project.setId(projectId)");
+
+
             } catch (MirroredTypeException mte) {
                 DeclaredType classTypeMirror = (DeclaredType) mte.getTypeMirror();
-                saveProjectBuilder = MethodSpec
+                saveMethodBuilder = MethodSpec
                         .methodBuilder("saveProject")
-                        .addModifiers(Modifier.PUBLIC)
-                        .addParameter(classTypeMirror.getClass(),"project")
-                        .addStatement(CodegenConstant.REPOSITORY_REFERENCE_VARIABLE.getValue()+".save(project)");
+                        .addParameter(classTypeMirror.getClass(),"project");
+                updateMethodBuilder = MethodSpec
+                        .methodBuilder("updateProject")
+                        .addParameter(classTypeMirror.getClass(),"project");
             }
 
-            MethodSpec saveProject = saveProjectBuilder.build();
-            methods.add(saveProject);
+            MethodSpec saveMethod = saveMethodBuilder
+                    .addModifiers(Modifier.PUBLIC)
+                    .addStatement(CodegenConstant.REPOSITORY_REFERENCE_VARIABLE.getValue()+".save(project)")
+                    .build();
+            methods.add(saveMethod);
+
+            MethodSpec updateMethod = updateMethodBuilder
+                    .addModifiers(Modifier.PUBLIC)
+                    .addStatement(CodegenConstant.REPOSITORY_REFERENCE_VARIABLE.getValue()+".save(project)")
+                    .build();
+            methods.add(updateMethod);
 
             FieldSpec.Builder builder;
             try {
