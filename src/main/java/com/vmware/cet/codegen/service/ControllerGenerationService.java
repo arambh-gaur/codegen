@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,11 +38,26 @@ public class ControllerGenerationService {
     public void generateController(String packageName, String businessClassname) {
 
         try {
-
+            List<FieldSpec> fields = new ArrayList<>();
+            List<MethodSpec> methods = new ArrayList<>();
             AnnotationSpec requestMappingAnnotation = AnnotationSpec
                     .builder(RequestMapping.class)
                     .addMember("value", "\"/api/v1\"")
                     .build();
+
+            AnnotationSpec getMappingAnnotation = AnnotationSpec
+                    .builder(GetMapping.class)
+                    .build();
+
+            MethodSpec fetchProjectsMethod = MethodSpec
+                    .methodBuilder("fetchProjects")
+                    .returns(List.class)
+                    .addModifiers(Modifier.PUBLIC)
+                    .addAnnotation(getMappingAnnotation)
+                    .addStatement("return "+CodegenConstant.BUSINESS_REFERENCE_VARIABLE.getValue()+".fetchProjects()")
+                    .build();
+
+            methods.add(fetchProjectsMethod);
 
             FieldSpec.Builder fsBuilder;
             try {
@@ -58,7 +74,6 @@ public class ControllerGenerationService {
 
             FieldSpec businessReferenceVariable = fsBuilder.build();
 
-            List<FieldSpec> fields = new ArrayList<>();
             fields.add(businessReferenceVariable);
 
             TypeSpec controller = TypeSpec
@@ -68,6 +83,7 @@ public class ControllerGenerationService {
                     .addAnnotation(requestMappingAnnotation)
                     .addModifiers(Modifier.PUBLIC)
                     .addFields(fields)
+                    .addMethods(methods)
                     .build();
 
             log.info("Added class");

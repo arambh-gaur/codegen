@@ -6,6 +6,7 @@ public enum DatabaseTypeConstant {
 
     VARCHAR("varchar(500)"),
     INT("int"),
+    BIGINT("bigint"),
     DATETIME("datetime"),
     BOOLEAN("boolean");
 

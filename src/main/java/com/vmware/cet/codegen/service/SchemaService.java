@@ -111,15 +111,16 @@ public class SchemaService {
                     log.info("Finished generating schema for input :{}",entityRequestDTO);
 
                     String modelClassName = modelGeneratorService.generateModelClass(entityRequestDTO);
-                    String businessClassname = businessGenerationService.generateBusinessClass(entityRequestDTO);
-                    controllerGenerationService.generateController(businessClassPackage,CodegenConstant.BUSINESS_CLASSNAME.getValue());
                     repositoryGenerationService.generateRepositoryClass(modelClassName, entityRequestDTO);
+                    String businessClassname = businessGenerationService.generateBusinessClass(entityRequestDTO, modelClassName);
+                    controllerGenerationService.generateController(businessClassPackage,CodegenConstant.BUSINESS_CLASSNAME.getValue());
+
                     log.info("Compiled all create statements");
                 }
 
             }
 
-            schemaRepository.createSchemaTables(tableCreationSequence,tableCreationStatements);
+            //schemaRepository.createSchemaTables(tableCreationSequence,tableCreationStatements);
 
 
         } catch (BusinessLayerException be) {

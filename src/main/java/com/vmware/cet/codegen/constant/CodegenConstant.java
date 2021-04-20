@@ -10,7 +10,7 @@ public enum CodegenConstant {
     BUSINESS_CLASSNAME("CodegenService"),
     BUSINESS_REFERENCE_VARIABLE("codegenService"),
     REPOSITORY_CLASSNAME("CodegenRepository"),
-    REPOSITORY_REFERENCE_VARIABLE("codegenRespository"),
+    REPOSITORY_REFERENCE_VARIABLE("codegenRepository"),
     CONTROLLER_CLASSNAME("CodegenController");
 
     @Getter
