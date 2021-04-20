@@ -9,7 +9,6 @@ import com.vmware.cet.codegen.model.EntityRequestDTO;
 import com.vmware.cet.codegen.repository.SchemaRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
-import org.aspectj.apache.bcel.classfile.Code;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,7 @@ public class SchemaService {
     private SchemaRepository schemaRepository;
 
     @Autowired
-    private ModelGeneratorService modelGeneratorService;
+    private EntityGenerationService entityGenerationService;
 
     @Autowired
     private BusinessGenerationService businessGenerationService;
@@ -110,7 +109,7 @@ public class SchemaService {
                     }
                     log.info("Finished generating schema for input :{}",entityRequestDTO);
 
-                    String modelClassName = modelGeneratorService.generateModelClass(entityRequestDTO);
+                    String modelClassName = entityGenerationService.generateModelClass(entityRequestDTO);
                     repositoryGenerationService.generateRepositoryClass(modelClassName, entityRequestDTO);
                     String businessClassname = businessGenerationService.generateBusinessClass(entityRequestDTO, modelClassName);
                     controllerGenerationService.generateController(businessClassPackage,CodegenConstant.BUSINESS_CLASSNAME.getValue());

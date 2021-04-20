@@ -1,6 +1,7 @@
 package com.vmware.cet.codegen.service;
 
 import com.google.common.base.CaseFormat;
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -15,8 +16,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.lang.model.element.Modifier;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Path;
@@ -27,7 +35,7 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class ModelGeneratorService {
+public class EntityGenerationService {
 
     @Value("${generated.code.model.pakage.name}")
     private String modelClassPackage;
@@ -52,6 +60,7 @@ public class ModelGeneratorService {
 
                 for(EntityRequestDTO.EntityFieldDTO entityFieldDTO : entityRequestDTO.getFields()) {
                     Type type = null;
+                    List<AnnotationSpec> fieldAnnotations = new ArrayList<>();
                     // remove underscores from field names and replace with camel case
                     String fieldName = entityFieldDTO.getFieldName();
                     fieldName = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, fieldName);
@@ -66,16 +75,54 @@ public class ModelGeneratorService {
                         type = Date.class;
                     }
 
+                    if(BooleanUtils.isTrue(entityFieldDTO.getIsPrimaryKey())) {
+                        AnnotationSpec idAnnotation = AnnotationSpec
+                                .builder(Id.class)
+                                .build();
+
+                        AnnotationSpec generationStrategyAnnotation = AnnotationSpec
+                                .builder(GeneratedValue.class)
+                                .addMember("strategy","$T.IDENTITY", GenerationType.class)
+                                .build();
+                        fieldAnnotations.add(idAnnotation);
+                        fieldAnnotations.add(generationStrategyAnnotation);
+
+                    } else {
+                        AnnotationSpec columnAnnotation = AnnotationSpec
+                                .builder(Column.class)
+                                .addMember("name", "\""+entityFieldDTO.getFieldName()+"\"")
+                                .build();
+                        fieldAnnotations.add(columnAnnotation);
+                    }
+
                     FieldSpec field = FieldSpec
                             .builder(type, fieldName)
                             .addModifiers(Modifier.PRIVATE)
+                            .addAnnotations(fieldAnnotations)
                             .build();
                     fields.add(field);
                 }
 
+                List<AnnotationSpec> classAnnotations = new ArrayList<>();
+                AnnotationSpec entityAnnotation = AnnotationSpec
+                        .builder(Entity.class)
+                        .build();
+                classAnnotations.add(entityAnnotation);
+
+                AnnotationSpec tableAnnotation = AnnotationSpec
+                        .builder(Table.class)
+                        .addMember("name", "\""+entityRequestDTO.getTableName()+"\"")
+                        .build();
+                classAnnotations.add(tableAnnotation);
+
+                AnnotationSpec dataAnnotation = AnnotationSpec
+                        .builder(Data.class)
+                        .build();
+                classAnnotations.add(dataAnnotation);
+
                 TypeSpec modelClass = TypeSpec
                         .classBuilder(className)
-                        .addAnnotation(Data.class)
+                        .addAnnotations(classAnnotations)
                         .addModifiers(Modifier.PUBLIC)
                         .addFields(fields)
                         .build();
