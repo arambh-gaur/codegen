@@ -13,8 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,15 +58,15 @@ public class ControllerGenerationService {
                     .builder(GetMapping.class)
                     .build();
 
-            MethodSpec fetchProjectsMethod = MethodSpec
-                    .methodBuilder("fetchProjects")
+            MethodSpec fetchMethod = MethodSpec
+                    .methodBuilder("fetchEntity")
                     .returns(List.class)
                     .addModifiers(Modifier.PUBLIC)
                     .addAnnotation(getMappingAnnotation)
                     .addStatement("return "+CodegenConstant.BUSINESS_REFERENCE_VARIABLE.getValue()+".fetchProjects()")
                     .build();
 
-            AnnotationSpec pathParam = AnnotationSpec.builder(RequestBody.class).build();
+            AnnotationSpec requestBodyAnnotation = AnnotationSpec.builder(RequestBody.class).build();
             ParameterSpec.Builder paramSpecBuilder;
             try {
                 ClassName clazz = ClassName.get(modelClassPackage, modelClassname);
@@ -72,10 +75,10 @@ public class ControllerGenerationService {
                 DeclaredType classTypeMirror = (DeclaredType) mte.getTypeMirror();
                 paramSpecBuilder = ParameterSpec.builder(classTypeMirror.getClass(), "project", Modifier.FINAL);
             }
-            ParameterSpec requestBody = paramSpecBuilder.addAnnotation(pathParam).build();
+            ParameterSpec requestBody = paramSpecBuilder.addAnnotation(requestBodyAnnotation).build();
 
-            MethodSpec saveProjectsMethod = MethodSpec
-                    .methodBuilder("saveProjects")
+            MethodSpec saveMethod = MethodSpec
+                    .methodBuilder("saveEntity")
                     .addModifiers(Modifier.PUBLIC)
                     .addAnnotation(PostMapping.class)
                     .addStatement("codegenService.saveProject(project)")
@@ -84,8 +87,39 @@ public class ControllerGenerationService {
                     .addStatement("return \"project details saved successfully\"")
                     .build();
 
-            methods.add(fetchProjectsMethod);
-            methods.add(saveProjectsMethod);
+            AnnotationSpec pathParamAnnotation = AnnotationSpec
+                    .builder(PathVariable.class)
+                    .addMember("value", "\"projectId\"")
+                    .build();
+            ParameterSpec projectId = ParameterSpec
+                    .builder(Integer.class, "projectId", Modifier.FINAL)
+                    .addAnnotation(pathParamAnnotation).build();
+
+            MethodSpec updateMethod = MethodSpec
+                    .methodBuilder("updateEntity")
+                    .addModifiers(Modifier.PUBLIC)
+                    .addAnnotation(PutMapping.class)
+                    .addStatement("codegenService.updateProject(project, projectId)")
+                    .addParameter(requestBody)
+                    .addParameter(projectId)
+                    .returns(String.class)
+                    .addStatement("return \"project details updated successfully\"")
+                    .build();
+
+            MethodSpec deleteMethod = MethodSpec
+                    .methodBuilder("deleteEntity")
+                    .addModifiers(Modifier.PUBLIC)
+                    .addAnnotation(DeleteMapping.class)
+                    .addStatement("codegenService.deleteProject(projectId)")
+                    .addParameter(projectId)
+                    .returns(String.class)
+                    .addStatement("return \"project details deleted successfully\"")
+                    .build();
+
+            methods.add(fetchMethod);
+            methods.add(saveMethod);
+            methods.add(updateMethod);
+            methods.add(deleteMethod);
 
             FieldSpec.Builder fsBuilder;
             try {
