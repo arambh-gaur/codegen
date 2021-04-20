@@ -4,6 +4,7 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.vmware.cet.codegen.constant.CodegenConstant;
@@ -19,6 +20,7 @@ import javax.lang.model.type.MirroredTypeException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -34,16 +36,42 @@ public class BusinessGenerationService {
     @Value("${generated.code.repository.pakage.name}")
     private String repositoryClassPackage;
 
+    @Value("${generated.code.model.pakage.name}")
+    private String modelClassPackage;
+
     public String generateBusinessClass(EntityRequestDTO entityRequestDTO, String modelClassname) {
         String fullyQualifiedClassName = null;
         try {
 
+            List<MethodSpec> methods = new ArrayList<>();
             MethodSpec fetchProjects = MethodSpec
                     .methodBuilder("fetchProjects")
                     .returns(List.class)
                     .addModifiers(Modifier.PUBLIC)
                     .addStatement("return "+CodegenConstant.REPOSITORY_REFERENCE_VARIABLE.getValue()+".findAll()")
                     .build();
+            methods.add(fetchProjects);
+
+            MethodSpec.Builder saveProjectBuilder;
+
+            try {
+                ClassName clazz = ClassName.get(modelClassPackage, modelClassname);
+                saveProjectBuilder = MethodSpec
+                        .methodBuilder("saveProject")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(clazz,"project")
+                        .addStatement(CodegenConstant.REPOSITORY_REFERENCE_VARIABLE.getValue()+".save(project)");
+            } catch (MirroredTypeException mte) {
+                DeclaredType classTypeMirror = (DeclaredType) mte.getTypeMirror();
+                saveProjectBuilder = MethodSpec
+                        .methodBuilder("saveProject")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(classTypeMirror.getClass(),"project")
+                        .addStatement(CodegenConstant.REPOSITORY_REFERENCE_VARIABLE.getValue()+".save(project)");
+            }
+
+            MethodSpec saveProject = saveProjectBuilder.build();
+            methods.add(saveProject);
 
             FieldSpec.Builder builder;
             try {
@@ -65,7 +93,7 @@ public class BusinessGenerationService {
                     .addAnnotation(Service.class)
                     .addAnnotation(Slf4j.class)
                     .addField(repositoryClassAutowiring)
-                    .addMethod(fetchProjects)
+                    .addMethods(methods)
                     .addModifiers(Modifier.PUBLIC)
                     .build();
 

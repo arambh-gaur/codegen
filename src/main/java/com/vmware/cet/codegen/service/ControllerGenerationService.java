@@ -5,6 +5,7 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.vmware.cet.codegen.constant.CodegenConstant;
@@ -13,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,7 +38,10 @@ public class ControllerGenerationService {
     @Value("${generated.code.controller.pakage.name}")
     private String controllerClassPackage;
 
-    public void generateController(String packageName, String businessClassname) {
+    @Value("${generated.code.model.pakage.name}")
+    private String modelClassPackage;
+
+    public void generateController(String packageName, String businessClassname, String modelClassname) {
 
         try {
             List<FieldSpec> fields = new ArrayList<>();
@@ -57,7 +63,29 @@ public class ControllerGenerationService {
                     .addStatement("return "+CodegenConstant.BUSINESS_REFERENCE_VARIABLE.getValue()+".fetchProjects()")
                     .build();
 
+            AnnotationSpec pathParam = AnnotationSpec.builder(RequestBody.class).build();
+            ParameterSpec.Builder paramSpecBuilder;
+            try {
+                ClassName clazz = ClassName.get(modelClassPackage, modelClassname);
+                paramSpecBuilder = ParameterSpec.builder(clazz, "project", Modifier.FINAL);
+            } catch (MirroredTypeException mte) {
+                DeclaredType classTypeMirror = (DeclaredType) mte.getTypeMirror();
+                paramSpecBuilder = ParameterSpec.builder(classTypeMirror.getClass(), "project", Modifier.FINAL);
+            }
+            ParameterSpec requestBody = paramSpecBuilder.addAnnotation(pathParam).build();
+
+            MethodSpec saveProjectsMethod = MethodSpec
+                    .methodBuilder("saveProjects")
+                    .addModifiers(Modifier.PUBLIC)
+                    .addAnnotation(PostMapping.class)
+                    .addStatement("codegenService.saveProject(project)")
+                    .addParameter(requestBody)
+                    .returns(String.class)
+                    .addStatement("return \"project details saved successfully\"")
+                    .build();
+
             methods.add(fetchProjectsMethod);
+            methods.add(saveProjectsMethod);
 
             FieldSpec.Builder fsBuilder;
             try {

@@ -39,6 +39,9 @@ public class SchemaService {
     @Autowired
     private RepositoryGenerationService repositoryGenerationService;
 
+    @Autowired
+    private MainClassGenerationService mainClassGenerationService;
+
     @Value("${generated.code.service.pakage.name}")
     private String businessClassPackage;
 
@@ -109,10 +112,11 @@ public class SchemaService {
                     }
                     log.info("Finished generating schema for input :{}",entityRequestDTO);
 
+                    mainClassGenerationService.generateMainClass();
                     String modelClassName = entityGenerationService.generateModelClass(entityRequestDTO);
                     repositoryGenerationService.generateRepositoryClass(modelClassName, entityRequestDTO);
                     String businessClassname = businessGenerationService.generateBusinessClass(entityRequestDTO, modelClassName);
-                    controllerGenerationService.generateController(businessClassPackage,CodegenConstant.BUSINESS_CLASSNAME.getValue());
+                    controllerGenerationService.generateController(businessClassPackage,CodegenConstant.BUSINESS_CLASSNAME.getValue(), modelClassName);
 
                     log.info("Compiled all create statements");
                 }

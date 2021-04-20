@@ -11,7 +11,8 @@ public enum CodegenConstant {
     BUSINESS_REFERENCE_VARIABLE("codegenService"),
     REPOSITORY_CLASSNAME("CodegenRepository"),
     REPOSITORY_REFERENCE_VARIABLE("codegenRepository"),
-    CONTROLLER_CLASSNAME("CodegenController");
+    CONTROLLER_CLASSNAME("CodegenController"),
+    MAIN_CLASSNAME("CodegenApplication");
 
     @Getter
     private String value;
